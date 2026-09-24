@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Merged into the app manifest on prebuild (expo autolinking);
+         plugins/withBackgroundTts.js defensively enforces the same entry. -->
+    <service
+      android:name="com.abhirahtech.readnest.tts.ReadNestTtsService"
+      android:foregroundServiceType="mediaPlayback"
+      android:exported="false" />
+  </application>
+</manifest>

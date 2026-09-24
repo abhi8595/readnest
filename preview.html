@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ReadNest — Premium UI Preview · Espresso &amp; Brass</title>
+<style>
+  :root{
+    --paper:#FBF7F0; --ink:#1E1B16; --card:#FFFFFF; --well:#F3EDE2;
+    --muted:#6B6357; --faint:#8A8175; --brand:#C4623A; --onbrand:#FFFFFF;
+    --branddeep:#8C3B1B; --sage:#7C9070; --line:#E3DACA; --danger:#B3261E;
+    --gold:#C9A45C; --golddeep:#7A5C14; --ongold:#1E1B16;
+    --page:#ECE5D8; --pageink:#1E1B16; --espresso:#171310;
+    --shadow:0 1px 2px rgba(30,27,22,.07), 0 8px 24px rgba(30,27,22,.08);
+    --shadow-lg:0 2px 4px rgba(30,27,22,.08), 0 20px 50px rgba(30,27,22,.16);
+  }
+  body.dark{
+    --paper:#1C1A17; --ink:#F3EDE2; --card:#26221D; --well:#2E2924;
+    --muted:#C9BFAE; --faint:#9A9081; --brand:#E08A5B; --onbrand:#1C1A17;
+    --branddeep:#F0B48A; --sage:#9DB493; --line:#3A342C; --danger:#F2A49E;
+    --gold:#E3C178; --golddeep:#E3C178; --ongold:#1C1A17;
+    --page:#100E0B; --pageink:#F3EDE2;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.5), 0 24px 60px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  body{margin:0; background:var(--page); color:var(--pageink); font-family:Georgia,'Times New Roman',serif; transition:background .3s,color .3s}
+  .ui{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,sans-serif}
+  .ic{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; flex:none}
+  .ic.fill{fill:currentColor; stroke:none}
+
+  /* ── Hero (always noir) ─────────────────────────────── */
+  .hero{background:
+      radial-gradient(900px 320px at 12% -10%, rgba(201,164,92,.22), transparent 60%),
+      radial-gradient(700px 300px at 95% 10%, rgba(196,98,58,.16), transparent 60%),
+      linear-gradient(165deg,#241D16 0%,#141110 58%,#1B1512 100%);
+    color:#F3EDE2; border-bottom:1px solid rgba(201,164,92,.25)}
+  .hero-in{max-width:1180px; margin:0 auto; padding:52px 24px 44px; display:flex; gap:32px; align-items:center; flex-wrap:wrap}
+  .appicon{width:104px; height:104px; border-radius:26px; flex:none; box-shadow:0 16px 44px rgba(0,0,0,.5), 0 0 0 1px rgba(201,164,92,.4)}
+  .eyebrow{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:11px; font-weight:800; letter-spacing:3px; color:#E3C178; margin:0 0 10px}
+  h1{font-size:clamp(30px,4.6vw,46px); line-height:1.08; margin:0 0 12px; font-weight:700; letter-spacing:-.5px}
+  h1 em{font-style:italic; background:linear-gradient(100deg,#F2DDA6,#C9A45C); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .sub{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:15px; line-height:1.65; color:#C9BFAE; margin:0; max-width:620px}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px}
+  .chip{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:11.5px; font-weight:700; letter-spacing:.4px; padding:7px 13px; border-radius:999px; border:1px solid rgba(201,164,92,.45); color:#E9D9B8; background:rgba(201,164,92,.08)}
+  .hero-cta{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap}
+  .btn{cursor:pointer; border-radius:12px; padding:12px 20px; font-size:14px; font-weight:700; font-family:-apple-system,'Segoe UI',Inter,sans-serif; border:1px solid rgba(201,164,92,.5); background:transparent; color:#F3EDE2; transition:transform .12s, box-shadow .2s, background .2s; display:inline-flex; align-items:center; gap:8px}
+  .btn:active{transform:scale(.97)}
+  .btn.gold{background:linear-gradient(120deg,#E3C178,#C9A45C); border:none; color:#1C1A17; box-shadow:0 8px 24px rgba(201,164,92,.3)}
+  .btn.ghost-light{background:rgba(255,255,255,.06)}
+  .hero-side{margin-left:auto; display:flex; flex-direction:column; gap:10px; min-width:200px}
+  .spec{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:12px; color:#9A9081; display:flex; gap:8px; align-items:center}
+  .spec .ic{width:15px; height:15px; color:#C9A45C}
+
+  main{max-width:1180px; margin:0 auto; padding:8px 24px 40px}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin:44px 0 6px; flex-wrap:wrap}
+  .sec-no{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:11px; font-weight:800; letter-spacing:2px; color:var(--golddeep); border:1px solid var(--gold); border-radius:999px; padding:4px 12px}
+  h2.sec{font-size:24px; margin:0; letter-spacing:-.3px}
+  p.sec{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:13.5px; color:var(--muted); margin:0 0 20px}
+
+  /* ── Phone ──────────────────────────────────────────── */
+  .stages{display:flex; gap:32px; flex-wrap:wrap; align-items:flex-start}
+  .phone{width:375px; height:812px; background:var(--paper); border-radius:52px; border:11px solid #0C0A08; outline:1px solid rgba(201,164,92,.35); outline-offset:-11px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:var(--shadow-lg), 0 0 0 1px rgba(0,0,0,.4); flex:none}
+  .phone::before{content:""; position:absolute; right:-3px; top:170px; width:3px; height:64px; background:#3a342c; border-radius:2px; z-index:60}
+  .phone::after{content:""; position:absolute; left:-3px; top:150px; width:3px; height:100px; background:#3a342c; border-radius:2px; z-index:60}
+  .notch{position:absolute; top:12px; left:50%; transform:translateX(-50%); width:112px; height:26px; background:#0C0A08; border-radius:999px; z-index:55}
+  .statusbar{display:flex; justify-content:space-between; align-items:center; padding:14px 26px 2px; font-size:13px; font-weight:700; position:relative; z-index:54}
+  .statusbar .sic{display:flex; gap:6px; align-items:center}
+  .statusbar .ic{width:16px; height:16px}
+  .screen{flex:1; overflow:hidden; display:flex; flex-direction:column; position:relative}
+  .scroll{flex:1; overflow-y:auto; scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+  .pad{padding:12px 16px 16px}
+  .row{display:flex; align-items:center; gap:10px}
+  .hairline-t{border-top:1px solid var(--line)}
+
+  .tabbar{display:flex; border-top:1px solid var(--line); background:var(--paper); padding:8px 4px 22px; position:relative; z-index:20}
+  .tab{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-weight:700; color:var(--muted); cursor:pointer; padding:6px 0; border-radius:10px; background:none; border:none; font-family:inherit; letter-spacing:.2px}
+  .tab.active{color:var(--brand)}
+  .tab .ic{width:22px; height:22px}
+
+  .wordmark{display:flex; align-items:center; gap:9px}
+  .mark{width:36px; height:36px; border-radius:11px; background:linear-gradient(150deg,#2E2620,#171310); display:flex; align-items:center; justify-content:center; color:#E3C178; box-shadow:inset 0 0 0 1px rgba(201,164,92,.5), 0 4px 10px rgba(0,0,0,.2)}
+  .mark .ic{width:21px; height:21px}
+  .pro-badge{display:inline-flex; align-items:center; gap:5px; background:linear-gradient(120deg,#E3C178,#C9A45C); color:#1C1A17; border-radius:999px; padding:8px 13px; font-size:11.5px; font-weight:800; letter-spacing:.8px; cursor:pointer; border:none; font-family:inherit; box-shadow:0 4px 12px rgba(201,164,92,.35)}
+  .pro-badge .ic{width:14px; height:14px}
+  .icon-btn{width:42px; height:42px; border-radius:12px; background:var(--card); border:1px solid var(--line); color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .searchbar{display:flex; align-items:center; gap:9px; background:var(--well); border:1px solid var(--line); border-radius:13px; padding:0 13px; min-height:47px; color:var(--muted); font-size:14px}
+  .searchbar input{border:none; background:none; outline:none; flex:1; font-size:14px; color:var(--ink); font-family:inherit}
+  .seg{display:flex; background:var(--well); border-radius:13px; padding:4px; gap:2px}
+  .seg button{flex:1; border:none; background:none; font-family:inherit; font-size:11.5px; font-weight:600; color:var(--muted); padding:9px 0; border-radius:9px; cursor:pointer; letter-spacing:.2px}
+  .seg button.on{background:var(--card); color:var(--ink); font-weight:800; box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
+  .continue{background:linear-gradient(150deg,var(--card),var(--card) 60%,var(--well)); border:1px solid var(--line); border-radius:18px; padding:14px; display:flex; gap:13px; align-items:center; cursor:pointer; box-shadow:var(--shadow); transition:transform .15s}
+  .continue:active{transform:scale(.985)}
+  .continue .eyebrow2{font-size:10px; font-weight:800; letter-spacing:1.6px; color:var(--brand); display:flex; align-items:center; gap:5px}
+  .continue .eyebrow2 .ic{width:13px; height:13px}
+  .ctitle{font-family:Georgia,serif; font-size:17px; font-weight:700; margin:3px 0 1px}
+  .cauthor{font-size:12px; color:var(--muted)}
+  .ring{position:relative; width:46px; height:46px; flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:10px}
+
+  .cover{border-radius:7px; display:flex; flex-direction:column; justify-content:space-between; padding:8px; color:#fff; position:relative; overflow:hidden; border:1px solid rgba(0,0,0,.15); box-shadow:0 6px 14px rgba(0,0,0,.22)}
+  .cover::before{content:""; position:absolute; top:0; bottom:0; left:0; width:9px; background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(255,255,255,0)); z-index:1}
+  .cover::after{content:""; position:absolute; inset:0; background:linear-gradient(115deg,rgba(255,255,255,.16) 0%,transparent 32%); z-index:1; pointer-events:none}
+  .cover>*{position:relative; z-index:2}
+  .fmt{font-size:9px; font-weight:800; letter-spacing:1px; background:rgba(0,0,0,.5); color:#F5E9CE; border:1px solid rgba(201,164,92,.5); border-radius:6px; padding:3px 7px; align-self:flex-start; backdrop-filter:blur(2px)}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:13px}
+  .book{cursor:pointer}
+  .book .t{font-size:12px; font-weight:700; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .book .a{font-size:10.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .pbar{height:4px; border-radius:2px; background:var(--well); overflow:hidden; margin-top:7px}
+  .pbar>i{display:block; height:100%; background:linear-gradient(90deg,var(--brand),var(--gold)); border-radius:2px}
+  .bookrow{display:flex; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:11px; align-items:center; cursor:pointer; box-shadow:var(--shadow)}
+  .fab{position:absolute; right:16px; bottom:98px; background:linear-gradient(140deg,#D47145,#B0512B); color:#fff; border:none; border-radius:999px; padding:14px 20px; font-size:14px; font-weight:800; display:flex; gap:8px; align-items:center; cursor:pointer; box-shadow:0 10px 24px rgba(196,98,58,.4); font-family:inherit; z-index:21}
+  body.dark .fab{background:linear-gradient(140deg,#E08A5B,#C46A35); color:#1C1A17}
+  .fab .ic{width:17px; height:17px}
+  .listitem{display:flex; gap:12px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px; cursor:pointer; box-shadow:var(--shadow)}
+  .avatar{width:42px; height:42px; border-radius:13px; background:linear-gradient(150deg,var(--well),var(--card)); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--brand); flex:none}
+  .note{font-size:12px; line-height:1.6; color:var(--muted)}
+  .quote-card{background:var(--card); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:14px; padding:14px; box-shadow:var(--shadow)}
+  .quote-text{font-family:Georgia,serif; font-size:15.5px; line-height:1.55}
+  .quote-note{background:var(--well); border-radius:9px; padding:9px 11px; margin-top:9px; font-size:13px; line-height:1.55}
+  .quote-src{font-size:12px; color:var(--brand); font-weight:700; margin-top:9px}
+
+  /* ── Reader ─────────────────────────────────────────── */
+  .reader{position:absolute; inset:0; display:none; flex-direction:column; z-index:40}
+  .reader.open{display:flex}
+  .rbody{flex:1; overflow-y:auto; padding:70px 28px 130px; scrollbar-width:none; transition:background .25s}
+  .rbody::-webkit-scrollbar{display:none}
+  .rbody .chap{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:11px; font-weight:800; letter-spacing:2.4px; margin-bottom:10px}
+  .rbody h2{font-family:Georgia,serif; font-size:27px; margin:0 0 14px; font-weight:700; letter-spacing:-.2px}
+  .rbody p{margin:.8em 0; text-align:justify; line-height:1.75}
+  .rbody p.lead::first-letter{font-size:3.4em; float:left; line-height:.86; padding:4px 8px 0 0; font-weight:700}
+  .rbody mark{background:linear-gradient(transparent 55%, rgba(201,164,92,.45) 55%); color:inherit; border-radius:2px; padding:0 1px}
+  .rbody .orn{text-align:center; letter-spacing:8px; opacity:.5; margin:1.4em 0}
+  .rbar{position:absolute; left:0; right:0; background:color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter:blur(10px); transition:transform .24s ease; z-index:41}
+  .rbar.top{top:0; border-bottom:1px solid var(--line); padding:48px 10px 8px}
+  .rbar.bot{bottom:0; border-top:1px solid var(--line); padding:12px 16px 28px}
+  .reader.hidechrome .rbar.top{transform:translateY(-112%)}
+  .reader.hidechrome .rbar.bot{transform:translateY(112%)}
+  .hairline{position:absolute; top:46px; left:0; right:0; height:2px; background:var(--well); z-index:42}
+  .hairline>i{display:block; height:100%; width:34%; background:linear-gradient(90deg,var(--brand),var(--gold))}
+  .rbtn{display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; color:var(--ink); font-size:9.5px; font-weight:700; cursor:pointer; padding:7px 11px; font-family:inherit; letter-spacing:.3px}
+  .rbtn span{color:var(--muted); font-weight:600}
+  .rbtns{display:flex; justify-content:space-around; margin-top:4px}
+  .ttscard{position:absolute; left:16px; right:16px; bottom:178px; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:14px; display:none; z-index:43; box-shadow:var(--shadow-lg)}
+  .ttscard.open{display:block}
+  .tts-play{width:54px; height:54px; border-radius:27px; background:linear-gradient(140deg,#D47145,#B0512B); color:#fff; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 18px rgba(196,98,58,.4)}
+  body.dark .tts-play{background:linear-gradient(140deg,#E08A5B,#C46A35); color:#1C1A17}
+  .rate{font-size:11.5px; font-weight:800; padding:6px 10px; border-radius:999px; background:var(--well); border:1px solid var(--line); cursor:pointer}
+  .rate.on{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+  .prem-strip{display:flex; align-items:center; gap:8px; margin-top:11px; background:linear-gradient(120deg,rgba(201,164,92,.16),rgba(201,164,92,.06)); border:1px solid rgba(201,164,92,.4); border-radius:12px; padding:10px 12px; font-size:12px; font-weight:700}
+  .prem-strip .ic{color:var(--golddeep)}
+  .scrim{position:absolute; inset:0; background:rgba(10,8,6,.55); display:none; z-index:44}
+  .scrim.open{display:block}
+  .sheet{position:absolute; left:0; right:0; bottom:0; background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px; padding:10px 16px 32px; display:none; z-index:45; max-height:80%; overflow-y:auto; scrollbar-width:none; box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+  .sheet.open{display:block}
+  .grip{width:40px; height:4px; border-radius:2px; background:var(--line); margin:0 auto 12px}
+  .themeopt{width:31%; border-radius:13px; overflow:hidden; border:1px solid var(--line); cursor:pointer; background:var(--card)}
+  .themeopt.on{border:2px solid var(--brand)}
+  .capline{font-size:11px; font-weight:800; color:var(--muted); letter-spacing:1.4px; margin:14px 0 8px}
+  .stepbtn{min-width:52px; height:52px; border-radius:26px; background:var(--well); border:1px solid var(--line); color:var(--ink); font-size:17px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 16px}
+  .fontopt{display:flex; align-items:center; justify-content:space-between; width:100%; padding:13px 14px; border-radius:13px; border:1px solid var(--line); background:var(--card); cursor:pointer; font-size:15px; color:var(--ink)}
+  .toast{position:absolute; left:50%; bottom:110px; transform:translateX(-50%) translateY(20px); background:#1C1A17; color:#F3EDE2; border:1px solid rgba(201,164,92,.5); font-size:13px; font-weight:600; padding:11px 18px; border-radius:999px; opacity:0; transition:all .25s; z-index:60; white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  .gallery{display:flex; gap:30px; flex-wrap:wrap}
+  .cap{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:12.5px; line-height:1.6; color:var(--muted); margin-top:12px; max-width:375px}
+  .cap b{color:var(--pageink)}
+  .kv{display:flex; padding:10px 14px; border-bottom:1px solid var(--line); font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv b{width:88px; font-weight:400; color:var(--muted); flex:none}
+  .kv span{font-weight:600}
+  .pbtn{width:100%; border-radius:13px; padding:14px; font-size:15px; font-weight:800; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:9px; border:1px solid var(--line); background:var(--card); color:var(--ink)}
+  .pbtn.primary{background:linear-gradient(140deg,#D47145,#B0512B); border:none; color:#fff; box-shadow:0 8px 20px rgba(196,98,58,.35)}
+  body.dark .pbtn.primary{background:linear-gradient(140deg,#E08A5B,#C46A35); color:#1C1A17}
+  .pbtn.gold{background:linear-gradient(120deg,#E3C178,#C9A45C); border:none; color:#1C1A17; box-shadow:0 8px 20px rgba(201,164,92,.35)}
+  .tagrow{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:13.5px; background:var(--card); border:1px solid var(--line); border-radius:999px; padding:9px 15px; cursor:pointer}
+  .feat{display:flex; gap:11px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px; box-shadow:var(--shadow)}
+  .bdot{width:38px; height:38px; border-radius:12px; background:linear-gradient(150deg,rgba(201,164,92,.22),rgba(201,164,92,.07)); border:1px solid rgba(201,164,92,.4); display:flex; align-items:center; justify-content:center; color:var(--golddeep); flex:none}
+  .bdot .ic{width:19px; height:19px}
+  .plan{flex:1; border-radius:15px; padding:14px 10px; text-align:center; border:1px solid var(--line); background:var(--well); cursor:pointer}
+  .plan.on{border:2px solid var(--gold); background:var(--card); box-shadow:0 8px 20px rgba(201,164,92,.2)}
+  .craft{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .swatches{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+  .sw{font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:11px; font-weight:700; padding:9px 13px; border-radius:10px; border:1px solid rgba(0,0,0,.12)}
+  footer{margin:56px 0 30px; padding-top:24px; border-top:1px solid var(--line); font-family:-apple-system,'Segoe UI',Inter,sans-serif; font-size:12.5px; line-height:1.8; color:var(--muted)}
+  footer code{background:var(--well); border:1px solid var(--line); border-radius:6px; padding:1px 7px; font-size:12px}
+  .noir{background:linear-gradient(170deg,#221C15,#141110 70%) !important; color:#F3EDE2}
+  .noir .note{color:#9A9081}
+  @media (max-width:860px){ .phone{width:100%; max-width:375px} .hero-side{margin-left:0} }
+</style>
+</head>
+<body class="ui">
+
+<!-- ══════════ SVG ICON SPRITE (Lucide-style, stroke 1.5 — zero emoji) ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+    <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-arrow-l" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M11.56 3.27a.5.5 0 0 1 .88 0l2.95 5.6a1 1 0 0 0 1.52.3l4.27-3.67a.5.5 0 0 1 .8.52l-2.83 10.24a1 1 0 0 1-.96.74H5.81a1 1 0 0 1-.96-.74L2.02 6.02a.5.5 0 0 1 .8-.52l4.27 3.67a1 1 0 0 0 1.52-.3Z"/><path d="M5 21h14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="7 4 20 12 7 20 7 4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" stroke="none"/><rect x="13.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none"/><path d="M19 5v14"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><polygon points="19 4 9 12 19 20 19 4" fill="currentColor" stroke="none"/><path d="M5 5v14"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".8"/><circle cx="17.5" cy="10.5" r=".8"/><circle cx="8.5" cy="7.5" r=".8"/><circle cx="6.5" cy="12.5" r=".8"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.43-.65-.43-1.12a1.64 1.64 0 0 1 1.67-1.67h2.52c3.04 0 5.53-2.55 5.53-5.53C22.45 6.23 17.44 2 12 2z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></symbol>
+    <symbol id="i-phones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 0 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/></symbol>
+    <symbol id="i-mark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+    <symbol id="i-timer" viewBox="0 0 24 24"><path d="M10 2h4"/><circle cx="12" cy="14" r="8"/><path d="M12 14v-4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2c.6 5 2.6 7 7.6 7.6-5 .6-7 2.6-7.6 7.6-.6-5-2.6-7-7.6-7.6 5-.6 7-2.6 7.6-7.6Z"/><path d="M19 2c.3 2.5 1.3 3.5 3.8 3.8-2.5.3-3.5 1.3-3.8 3.8-.3-2.5-1.3-3.5-3.8-3.8 2.5-.3 3.5-1.3 3.8-3.8Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="14" rx="1.5"/><rect width="7" height="7" x="3" y="14" rx="1.5"/></symbol>
+    <symbol id="i-feather" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2.02-2-2H4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .01-1 1.03V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.76-2.02-2-2h-4c-1.25 0-2 .75-2 1.97V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><path d="M5 20v-3"/><path d="M10 20v-7"/><path d="M15 20v-11"/><path d="M20 20V4"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12a10 10 0 0 1 14 0"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="8" width="17" height="9" rx="2.5"/><path d="M22 11v3"/><rect x="4.5" y="10.5" width="10" height="4" rx="1" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="hero-in">
+    <img class="appicon" src="data:image/png;base64,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" alt="ReadNest app icon" width="104" height="104"/>
+    <div style="flex:1; min-width:270px">
+      <p class="eyebrow">READNEST · COMPLETE EDITION · ESPRESSO &amp; BRASS</p>
+      <h1>A quiet home for <em>your books.</em></h1>
+      <p class="sub">The premium redesign: a noir-and-brass identity, refined serif reading surfaces, hairline craft details — and a strict <b>zero-emoji</b> icon system across every pixel. Tap through the live demo below.</p>
+      <div class="chips"><span class="chip">EPUB · PDF · MOBI · AZW3</span><span class="chip">CBZ · CBR · FB2 · TXT · DOCX · ODT</span><span class="chip">5 reader themes</span><span class="chip">Read-aloud + sleep timer</span><span class="chip">Quotes hub</span><span class="chip">Dictionary</span><span class="chip">Drive sync</span></div>
+      <div class="hero-cta">
+        <button class="btn gold" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})"><svg class="ic"><use href="#i-play"/></svg> Try the live demo</button>
+        <button class="btn ghost-light" id="modeBtn"><svg class="ic"><use href="#i-moon"/></svg> <span>Dark page</span></button>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="spec"><svg class="ic"><use href="#i-badge"/></svg> Zero-emoji UI · SVG icons only</div>
+      <div class="spec"><svg class="ic"><use href="#i-badge"/></svg> Body contrast 4.5:1 or higher</div>
+      <div class="spec"><svg class="ic"><use href="#i-badge"/></svg> 48dp touch targets</div>
+      <div class="spec"><svg class="ic"><use href="#i-badge"/></svg> 13 formats · honest tiers</div>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="sec-head" id="demo"><span class="sec-no">01</span><h2 class="sec">Live demo — tap through the app</h2></div>
+<p class="sec">Library segments · open a book · tap the page to hide chrome · Theme, Display and Listen all work · search filters live.</p>
+<div class="stages">
+  <div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="statusbar"><span>9:41</span><span class="sic"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
+      <div class="screen">
+        <!-- LIBRARY -->
+        <div class="scroll" data-view="library">
+          <div class="pad" style="display:flex; flex-direction:column; gap:12px">
+            <div class="row" style="justify-content:space-between">
+              <div class="wordmark">
+                <div class="mark"><svg class="ic"><use href="#i-book"/></svg></div>
+                <div><div style="font-size:19px;font-weight:800;font-family:Georgia,serif;letter-spacing:-.2px">ReadNest</div>
+                <div style="font-size:11px;color:var(--muted)">6 books · 2 shelves</div></div>
+              </div>
+              <button class="pro-badge" onclick="toast('Premium — see the paywall screen below')"><svg class="ic"><use href="#i-crown"/></svg> PRO</button>
+            </div>
+            <div class="searchbar"><svg class="ic"><use href="#i-search"/></svg><span>Search title, author, series…</span></div>
+            <div class="seg" id="libSeg">
+              <button class="on">All</button><button>Authors</button><button>Series</button><button>Shelves</button><button>Dupes</button>
+            </div>
+            <div class="continue" onclick="openReader()" role="button" aria-label="Continue reading Dune">
+              <div class="cover" style="width:62px;height:94px;background:linear-gradient(135deg,#31435C,#141C28)"><span class="fmt">EPUB</span><span style="font-size:10.5px;font-family:Georgia,serif;font-weight:700">Dune</span><span style="font-size:8px;opacity:.75">F. Herbert</span></div>
+              <div style="flex:1">
+                <div class="eyebrow2"><svg class="ic"><use href="#i-flame"/></svg> CONTINUE READING</div>
+                <div class="ctitle">Dune</div>
+                <div class="cauthor">Frank Herbert · Chapter 12</div>
+                <div class="pbar"><i style="width:62%"></i></div>
+              </div>
+              <div class="ring">
+                <svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--well)" stroke-width="5"/><circle cx="23" cy="23" r="19" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="45"/></svg>
+                <b>62%</b>
+              </div>
+            </div>
+            <div class="grid3" id="bookGrid"></div>
+            <div style="height:96px"></div>
+          </div>
+        </div>
+        <!-- FOLDERS -->
+        <div class="scroll" data-view="folders" style="display:none">
+          <div class="pad" style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:23px;font-weight:800;font-family:Georgia,serif">Folders</div>
+            <button class="pbtn primary" onclick="toast('System folder picker (dev-client build)')"><svg class="ic"><use href="#i-folder-plus"/></svg> Grant folder access</button>
+            <div class="listitem"><div class="avatar"><svg class="ic"><use href="#i-download"/></svg></div><div style="flex:1"><b>Downloads</b><div class="note">4 books · scanned 2h ago</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+            <div class="listitem"><div class="avatar"><svg class="ic"><use href="#i-book"/></svg></div><div style="flex:1"><b>Ebooks</b><div class="note">2 books · scanned yesterday</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+            <div class="listitem"><div class="avatar"><svg class="ic"><use href="#i-folder"/></svg></div><div style="flex:1"><b>Imported</b><div class="note">6 books</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+          </div>
+        </div>
+        <!-- SEARCH -->
+        <div class="scroll" data-view="search" style="display:none">
+          <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+            <div class="row" style="justify-content:space-between"><div style="font-size:23px;font-weight:800;font-family:Georgia,serif">Search</div>
+            <button class="pbtn" style="width:auto;padding:9px 14px;font-size:12px" onclick="toast('Dictionary hub — see screens below')"><svg class="ic" style="width:16px;height:16px"><use href="#i-book"/></svg> Dictionary</button></div>
+            <div class="searchbar"><svg class="ic"><use href="#i-search"/></svg><input id="q" placeholder="Title, author, series, format…" oninput="doSearch(this.value)" aria-label="Search books"/></div>
+            <div id="searchRes" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+        </div>
+        <!-- NOTES -->
+        <div class="scroll" data-view="notes" style="display:none">
+          <div class="pad" style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:23px;font-weight:800;font-family:Georgia,serif">Quotes &amp; Notes</div>
+            <div class="searchbar"><svg class="ic"><use href="#i-search"/></svg><span>Search quotes and notes…</span></div>
+            <div class="quote-card">
+              <div class="quote-text">“I must not fear. Fear is the mind-killer.”</div>
+              <div class="quote-note">The litany — reread before the Gom Jabbar scene.</div>
+              <div class="quote-src">Dune · Chapter 1</div>
+            </div>
+            <div class="quote-card" style="border-left-color:var(--sage)">
+              <div class="quote-text">“It is our choices that show what we truly are.”</div>
+              <div class="quote-src">Harry Potter · Chamber of Secrets</div>
+            </div>
+          </div>
+        </div>
+        <!-- SETTINGS -->
+        <div class="scroll" data-view="settings" style="display:none">
+          <div class="pad" style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:23px;font-weight:800;font-family:Georgia,serif">Settings</div>
+            <div style="background:linear-gradient(140deg,#2A2118,#171310); color:#F3EDE2; border:1px solid rgba(201,164,92,.4); border-radius:17px; padding:15px">
+              <div style="font-size:11px;font-weight:800;letter-spacing:1.6px;color:#E3C178;display:flex;align-items:center;gap:6px"><svg class="ic" style="width:14px;height:14px"><use href="#i-flame"/></svg> 12-DAY STREAK</div>
+              <div class="row" style="margin-top:12px; text-align:center">
+                <div style="flex:1"><b>48m</b><div class="note" style="color:#9A9081">Today</div></div>
+                <div style="flex:1"><b>5h 20m</b><div class="note" style="color:#9A9081">Week</div></div>
+                <div style="flex:1"><b>3</b><div class="note" style="color:#9A9081">Finished</div></div>
+                <div style="flex:1"><b>27</b><div class="note" style="color:#9A9081">Quotes</div></div>
+              </div>
+            </div>
+            <div class="listitem"><div class="avatar" style="color:var(--golddeep)"><svg class="ic"><use href="#i-crown"/></svg></div><div style="flex:1"><b>ReadNest Premium</b><div class="note">Sync · background listen · fonts · no ads</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+            <div class="listitem"><div class="avatar"><svg class="ic"><use href="#i-palette"/></svg></div><div style="flex:1"><b>Appearance</b><div class="note">System · Light · Dark</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+            <div class="listitem"><div class="avatar"><svg class="ic"><use href="#i-download"/></svg></div><div style="flex:1"><b>Google Drive sync</b><div class="note">Premium feature</div></div><svg class="ic" style="color:var(--muted)"><use href="#i-chev-r"/></svg></div>
+          </div>
+        </div>
+
+        <button class="fab" onclick="toast('System file picker — multi-select import')"><svg class="ic"><use href="#i-plus"/></svg> Add</button>
+
+        <nav class="tabbar" id="tabbar" aria-label="Main tabs">
+          <button class="tab active" data-tab="library"><svg class="ic"><use href="#i-library"/></svg><span>Library</span></button>
+          <button class="tab" data-tab="folders"><svg class="ic"><use href="#i-folder"/></svg><span>Folders</span></button>
+          <button class="tab" data-tab="search"><svg class="ic"><use href="#i-search"/></svg><span>Search</span></button>
+          <button class="tab" data-tab="notes"><svg class="ic"><use href="#i-pen"/></svg><span>Notes</span></button>
+          <button class="tab" data-tab="settings"><svg class="ic"><use href="#i-sliders"/></svg><span>Settings</span></button>
+        </nav>
+
+        <!-- READER -->
+        <div class="reader hidechrome" id="reader">
+          <div class="hairline"><i></i></div>
+          <div class="rbar top"><div class="row">
+            <button class="rbtn" onclick="closeReader()" aria-label="Back to library"><svg class="ic"><use href="#i-arrow-l"/></svg></button>
+            <div style="flex:1"><div style="font-size:14px;font-weight:800">Dune</div><div style="font-size:11px;color:var(--muted)">Chapter 12 · 62%</div></div>
+            <button class="rbtn" onclick="toast('Search in book — 14 matches')" aria-label="Search in book"><svg class="ic"><use href="#i-search"/></svg></button>
+            <button class="rbtn" onclick="toast('Bookmarked — Chapter 12')" aria-label="Bookmark"><svg class="ic"><use href="#i-mark"/></svg></button>
+          </div></div>
+          <div class="rbody" id="rbody" onclick="toggleChrome(event)">
+            <div class="chap" id="rchap">CHAPTER 12 · ARRAKIS</div>
+            <h2>The Gom Jabbar</h2>
+            <p class="lead" id="rlead">In the week before their departure to Arrakis, when all the final scurrying about had reached a nearly unbearable frenzy, an old crone in a black gown appeared before Paul in the hall.</p>
+            <p>“Have you ever heard of the Gom Jabbar?” she asked, her voice like dry leaves over stone.</p>
+            <p>Paul shook his head. The old woman smiled — if the thin stretching of her lips could be called a smile — and produced a small black box from the folds of her gown.</p>
+            <p>“Put your right hand in the box,” she said. “And remember: <mark>I must not fear. Fear is the mind-killer.</mark>”</p>
+            <p>The test of humanity, she explained, was simple only in the telling. An animal caught in a trap will gnaw off its own leg to escape. A human will remain, endure the pain, and feign death — that the trap might destroy the hunter instead.</p>
+            <div class="orn">· · ·</div>
+            <p>Outside, the wind moved through the Caladan pines, and somewhere below, the sea folded itself against the rocks in slow, patient rhythms — as if the whole planet were breathing in its sleep.</p>
+            <p>Paul placed his hand inside the box.</p>
+          </div>
+          <div class="rbar bot">
+            <div class="pbar" style="margin-top:0"><i style="width:62%"></i></div>
+            <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:5px">62% · 38 min left in chapter</div>
+            <div class="rbtns">
+              <button class="rbtn" onclick="toast('Contents — 22 chapters')"><svg class="ic"><use href="#i-list"/></svg><span>Contents</span></button>
+              <button class="rbtn" onclick="openSheet('themeSheet')"><svg class="ic"><use href="#i-palette"/></svg><span>Theme</span></button>
+              <button class="rbtn" onclick="toggleTTS()"><svg class="ic"><use href="#i-phones"/></svg><span>Listen</span></button>
+              <button class="rbtn" onclick="toast('4 bookmarks in this book')"><svg class="ic"><use href="#i-mark"/></svg><span>Marks</span></button>
+              <button class="rbtn" onclick="openSheet('displaySheet')"><svg class="ic"><use href="#i-sliders"/></svg><span>Display</span></button>
+            </div>
+          </div>
+          <div class="ttscard" id="ttsCard" role="toolbar" aria-label="Read aloud controls">
+            <div class="row" style="justify-content:space-between">
+              <button class="rbtn" onclick="toggleTTS()" aria-label="Stop"><svg class="ic"><use href="#i-stop"/></svg></button>
+              <button class="rbtn" onclick="toast('Back 3 sentences')" aria-label="Previous"><svg class="ic"><use href="#i-prev"/></svg></button>
+              <button class="tts-play" id="ttsPlay" onclick="togglePlay()" aria-label="Pause"><svg class="ic" style="width:22px;height:22px"><use href="#i-pause"/></svg></button>
+              <button class="rbtn" onclick="toast('Forward 3 sentences')" aria-label="Next"><svg class="ic"><use href="#i-next"/></svg></button>
+              <button class="rbtn" onclick="toast('Sleep timer — 15 min')" aria-label="Sleep timer"><svg class="ic"><use href="#i-timer"/></svg></button>
+            </div>
+            <div class="row" style="margin-top:10px;gap:6px">
+              <span class="rate">0.75×</span><span class="rate on">1×</span><span class="rate">1.25×</span><span class="rate">1.5×</span><span class="rate">2×</span>
+            </div>
+            <div class="prem-strip"><svg class="ic" style="width:16px;height:16px"><use href="#i-crown"/></svg> Background play with screen locked — Premium</div>
+          </div>
+          <div class="scrim" id="scrim" onclick="closeSheets()"></div>
+          <div class="sheet" id="themeSheet">
+            <div class="grip"></div>
+            <div class="row" style="justify-content:space-between;margin-bottom:12px"><b style="font-size:17px">Reading theme</b><button class="rbtn" onclick="closeSheets()" aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap" id="themeRow"></div>
+          </div>
+          <div class="sheet" id="displaySheet">
+            <div class="grip"></div>
+            <div class="row" style="justify-content:space-between;margin-bottom:12px"><b style="font-size:17px">Display</b><button class="rbtn" onclick="closeSheets()" aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            <div class="capline">TEXT SIZE</div>
+            <div class="row" style="justify-content:space-between;margin-bottom:6px">
+              <button class="stepbtn" onclick="fontSize(-1)" aria-label="Decrease text size">A−</button><b id="fsLabel">18 pt</b><button class="stepbtn" onclick="fontSize(1)" aria-label="Increase text size">A+</button>
+            </div>
+            <div class="capline">TYPEFACE</div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="fontRow"></div>
+            <div class="capline">HIGHLIGHTS</div>
+            <div class="row" style="gap:10px;flex-wrap:wrap" id="hlRow"></div>
+          </div>
+        </div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+    </div>
+    <p class="cap"><b>Interactive.</b> Switch tabs · tap the Dune card to open the reader · tap the text to show chrome · Theme, Display and Listen work · live search · page-wide dark mode above.</p>
+  </div>
+
+  <div style="flex:1; min-width:300px">
+    <h2 class="sec" style="margin-top:0">Craft details — what makes it premium</h2>
+    <div style="display:grid; gap:10px; margin-top:14px" class="ui">
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-crown"/></svg></div><div><b>Espresso &amp; Brass identity</b><div class="note">Noir gradient tile, hairline brass keyline, book-and-nest mark. Gold is reserved strictly for Premium surfaces.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-type"/></svg></div><div><b>Editorial typography</b><div class="note">Serif display + letterspaced kickers · drop caps · justified measure capped for readability.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-shield"/></svg></div><div><b>Zero-emoji icon system</b><div class="note">Every glyph is SVG at 1.5pt stroke — navigation, badges, toasts, even the status bar.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-feather"/></svg></div><div><b>Material honesty</b><div class="note">Book spines with light-catch, layered soft shadows, hairline dividers, blurred reader chrome.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-phones"/></svg></div><div><b>Complete feature set</b><div class="note">13 formats · 5 themes · read-aloud + sleep timer · quotes hub · dictionary · Drive sync · paywall.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-badge"/></svg></div><div><b>Accessible by construction</b><div class="note">4.5:1 body contrast, 48dp targets, labelled controls, reduced-motion support.</div></div></div>
+    </div>
+    <h2 class="sec" style="margin-top:26px">Token palette</h2>
+    <div class="swatches">
+      <span class="sw" style="background:#FBF7F0;color:#1E1B16">Paper #FBF7F0</span>
+      <span class="sw" style="background:#1E1B16;color:#F3EDE2">Ink #1E1B16</span>
+      <span class="sw" style="background:#C4623A;color:#fff">Terracotta #C4623A</span>
+      <span class="sw" style="background:linear-gradient(120deg,#E3C178,#C9A45C);color:#1C1A17">Brass #C9A45C</span>
+      <span class="sw" style="background:#7C9070;color:#fff">Sage #7C9070</span>
+      <span class="sw" style="background:#171310;color:#E3C178;border-color:#C9A45C">Espresso #171310</span>
+    </div>
+  </div>
+</div>
+
+<div class="sec-head"><span class="sec-no">02</span><h2 class="sec">Reader themes — all five, exactly as coded</h2></div>
+<p class="sec">Same values as <span class="ui" style="font-size:12px">src/theme/tokens.ts</span>. Every body pair at 7:1 or higher.</p>
+<div class="gallery ui" id="themeGallery"></div>
+
+<div class="sec-head"><span class="sec-no">03</span><h2 class="sec">About Document · Dictionary · Onboarding</h2></div>
+<p class="sec">Support screens rendered with live theme tokens.</p>
+<div class="gallery">
+  <div><div class="phone" style="height:720px"><div class="notch"></div><div class="statusbar"><span>9:41</span><span class="sic"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div><div class="screen scroll">
+    <div class="pad">
+      <div class="row"><svg class="ic"><use href="#i-arrow-l"/></svg><b>About document</b></div>
+      <div class="row" style="margin-top:14px;align-items:flex-start">
+        <div class="cover" style="width:102px;height:152px;background:linear-gradient(135deg,#31435C,#141C28)"><span class="fmt">EPUB</span><span style="font-family:Georgia,serif;font-weight:700">Dune</span><span style="font-size:9px;opacity:.75">Frank Herbert</span></div>
+        <div style="flex:1"><div style="font-family:Georgia,serif;font-size:20px;font-weight:800">Dune</div>
+        <div class="note">Frank Herbert</div>
+        <div class="row" style="margin-top:8px"><span class="fmt">EPUB</span><span class="fmt">1.2 MB</span></div>
+        <div class="pbar"><i style="width:62%"></i></div>
+        <div class="note" style="margin-top:5px">62% · 4 bookmarks · 9 quotes</div></div>
+      </div>
+      <button class="pbtn primary" style="margin-top:14px"><svg class="ic"><use href="#i-book"/></svg> Continue reading</button>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden;box-shadow:var(--shadow)">
+        <div class="kv"><b>Format</b><span>EPUB ebook</span></div>
+        <div class="kv"><b>Author</b><span>Frank Herbert</span></div>
+        <div class="kv"><b>Series</b><span>Dune Chronicles</span></div>
+        <div class="kv"><b>Publisher</b><span>Ace Books</span></div>
+        <div class="kv"><b>Language</b><span>English</span></div>
+        <div class="kv"><b>Location</b><span>Downloads</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button class="pbtn" style="flex:1;min-width:100px"><svg class="ic" style="width:16px;height:16px"><use href="#i-pen"/></svg> Rename</button>
+        <button class="pbtn" style="flex:1;min-width:100px"><svg class="ic" style="width:16px;height:16px"><use href="#i-mark"/></svg> Shelf</button>
+        <button class="pbtn" style="flex:1;min-width:100px"><svg class="ic" style="width:16px;height:16px"><use href="#i-heart"/></svg> Save</button>
+        <button class="pbtn" style="flex:1;min-width:100px"><svg class="ic" style="width:16px;height:16px"><use href="#i-share"/></svg> Share</button>
+      </div>
+    </div>
+  </div></div><p class="cap"><b>About Document</b> — metadata table, progress, rename / shelf / favorite / share / delete.</p></div>
+
+  <div><div class="phone" style="height:720px"><div class="notch"></div><div class="statusbar"><span>9:41</span><span class="sic"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div><div class="screen scroll">
+    <div class="pad" style="display:flex;flex-direction:column;gap:12px">
+      <div class="row"><svg class="ic"><use href="#i-x"/></svg><b>Dictionary</b></div>
+      <div class="searchbar"><svg class="ic"><use href="#i-search"/></svg><span>quintessential</span></div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:var(--shadow)">
+        <div class="row"><span style="font-family:Georgia,serif;font-size:23px;font-weight:800">quintessential</span><span class="fmt" style="margin-left:auto;color:var(--muted);background:var(--well);border-color:var(--line)">OFFLINE</span></div>
+        <div style="font-size:14px;line-height:1.65;margin-top:10px"><i style="color:var(--brand);font-weight:700">adjective</i><br/>1. Representing the perfect example of something.</div>
+        <div style="font-size:14px;line-height:1.65;margin-top:8px"><i style="color:var(--brand);font-weight:700">noun</i><br/>1. The pure, concentrated essence of a thing.</div>
+        <div class="row" style="margin-top:10px;font-size:13px;font-weight:700;color:var(--brand)"><svg class="ic" style="width:15px;height:15px"><use href="#i-external"/></svg> Full entry on Wiktionary</div>
+      </div>
+      <div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1.4px">RECENT LOOKUPS</div>
+      <div class="tagrow"><span class="tag">ephemeral</span><span class="tag">solace</span><span class="tag">myriad</span><span class="tag">odyssey</span><span class="tag">luminous</span></div>
+    </div>
+  </div></div><p class="cap"><b>Dictionary hub</b> — offline seed + online API + history. Long-press any word in the reader to land here.</p></div>
+
+  <div><div class="phone" style="height:720px"><div class="notch"></div><div class="statusbar"><span>9:41</span><span class="sic"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div><div class="screen scroll">
+    <div class="pad" style="display:flex;flex-direction:column;gap:14px;min-height:100%">
+      <div class="row" style="justify-content:space-between"><div class="wordmark"><div class="mark"><svg class="ic"><use href="#i-book"/></svg></div><b style="font-family:Georgia,serif;font-size:17px">ReadNest</b></div><span class="note">Skip</span></div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+        <div style="width:88px;height:88px;border-radius:26px;background:linear-gradient(150deg,#2E2620,#171310);border:1px solid rgba(201,164,92,.5);display:flex;align-items:center;justify-content:center;color:#E3C178"><svg class="ic" style="width:40px;height:40px"><use href="#i-book"/></svg></div>
+        <div style="font-family:Georgia,serif;font-size:31px;font-weight:700;line-height:1.14;letter-spacing:-.4px">A reader that feels like paper</div>
+        <div class="note" style="font-size:14.5px">Warm themes, beautiful serif type, bookmarks, highlights, notes, dictionary and read-aloud — in Day, Sepia, Night, Console and OLED.</div>
+      </div>
+      <div class="row" style="justify-content:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:var(--line)"></span><span style="width:7px;height:7px;border-radius:4px;background:var(--line)"></span><span style="width:24px;height:7px;border-radius:4px;background:var(--brand)"></span><span style="width:7px;height:7px;border-radius:4px;background:var(--line)"></span></div>
+      <button class="pbtn primary">Continue</button>
+      <div style="height:16px"></div>
+    </div>
+  </div></div><p class="cap"><b>Onboarding</b> — four value slides, permission rationale before any system prompt.</p></div>
+</div>
+
+<div class="sec-head"><span class="sec-no">04</span><h2 class="sec">Premium paywall</h2></div>
+<p class="sec">Noir treatment with brass · RevenueCat-backed · lifetime + yearly · restores · honest free-tier framing.</p>
+<div class="gallery">
+  <div><div class="phone" style="height:800px"><div class="notch"></div><div class="statusbar" style="color:#F3EDE2"><span>9:41</span><span class="sic"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div><div class="screen scroll noir">
+    <div class="pad" style="display:flex;flex-direction:column;gap:10px">
+      <div class="row" style="justify-content:flex-end"><span class="icon-btn" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#F3EDE2;border-radius:999px"><svg class="ic"><use href="#i-x"/></svg></span></div>
+      <div style="text-align:center">
+        <div style="width:66px;height:66px;border-radius:33px;background:linear-gradient(140deg,#E3C178,#9A7A2E);color:#1C1A17;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 12px 30px rgba(201,164,92,.35)"><svg class="ic" style="width:30px;height:30px"><use href="#i-crown"/></svg></div>
+        <div style="font-family:Georgia,serif;font-size:26px;font-weight:700;margin-top:10px">ReadNest Premium</div>
+        <div class="note">Unlock the full reading nest.</div>
+      </div>
+      <div class="feat" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"><div class="bdot"><svg class="ic"><use href="#i-shield"/></svg></div><div><b>Ad-free reading</b><div class="note">No banners, no interstitials.</div></div></div>
+      <div class="feat" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"><div class="bdot"><svg class="ic"><use href="#i-download"/></svg></div><div><b>Google Drive sync</b><div class="note">Books, progress and notes everywhere.</div></div></div>
+      <div class="feat" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"><div class="bdot"><svg class="ic"><use href="#i-phones"/></svg></div><div><b>Background read-aloud</b><div class="note">Listen with the screen locked.</div></div></div>
+      <div class="feat" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"><div class="bdot"><svg class="ic"><use href="#i-type"/></svg></div><div><b>Custom fonts</b><div class="note">Upload your own TTF or OTF.</div></div></div>
+      <div class="feat" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"><div class="bdot"><svg class="ic"><use href="#i-pen"/></svg></div><div><b>8 highlight colors</b><div class="note">Double the palette.</div></div></div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <div class="plan on" style="background:rgba(201,164,92,.1)"><div style="font-size:10px;font-weight:800;color:#E3C178;letter-spacing:1px">BEST VALUE</div><b>Lifetime</b><div style="font-size:19px;font-weight:800">$24.99</div><div class="note">Pay once, forever</div></div>
+        <div class="plan" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)"><b>Yearly</b><div style="font-size:19px;font-weight:800">$9.99/yr</div><div class="note">Cancel anytime</div></div>
+      </div>
+      <button class="pbtn gold"><svg class="ic"><use href="#i-crown"/></svg> Get Lifetime Access</button>
+      <div style="text-align:center;font-size:13px;font-weight:700;color:#E3C178">Restore purchases</div>
+      <div style="height:10px"></div>
+    </div>
+  </div></div><p class="cap"><b>Paywall</b> — context-aware headline per entry point: sync, fonts, background TTS, colors.</p></div>
+
+  <div style="flex:1;min-width:290px">
+    <h2 class="sec" style="margin-top:0">Quality bar — pre-delivery checklist</h2>
+    <p class="sec">From the ui-ux-pro-max pro-rules, verified in this build.</p>
+    <div class="craft ui" id="checklist"></div>
+    <h2 class="sec" style="margin-top:24px">What changed in this pass</h2>
+    <div style="display:grid;gap:10px;margin-top:12px" class="ui">
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-x"/></svg></div><div><b>56 emoji glyphs removed</b><div class="note">Replaced with a 40-icon SVG sprite — tabs, badges, toasts, status bar included.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-spark"/></svg></div><div><b>Production asset set</b><div class="note">AI-crafted master icon (your pick) + adaptive, splash light/dark, favicon at exact store sizes.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-crown"/></svg></div><div><b>Brass premium language</b><div class="note">New gold tokens in code + CSS · noir paywall · PRO badges · progress ring.</div></div></div>
+      <div class="feat"><div class="bdot"><svg class="ic"><use href="#i-feather"/></svg></div><div><b>Editorial reader</b><div class="note">Drop caps · kickers · brass marginalia · blurred chrome · hairline progress.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <b>ReadNest</b> · com.abhirahtech.readnest · Expo SDK 56 · NativeWind v4 · Zustand · expo-sqlite ·
+  Run <code>npx expo start --dev-client</code> inside <code>readnest/</code> for the real app ·
+  Tokens: <code>design-system/readnest/</code> · Store copy: <code>store-listing.md</code> · Privacy: <code>privacy-policy.md</code>
+</footer>
+</main>
+
+<script>
+function ic(n, s){ return '<svg class="ic"'+(s?' style="width:'+s+'px;height:'+s+'px"':'')+'><use href="#i-'+n+'"/></svg>'; }
+/* toast (alert() is blocked in sandboxed previews) */
+let toastT = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+/* books */
+const BOOKS = [
+  {t:'Dune', a:'Frank Herbert', f:'EPUB', g:'linear-gradient(135deg,#31435C,#141C28)', p:62},
+  {t:'Project Hail Mary', a:'Andy Weir', f:'EPUB', g:'linear-gradient(135deg,#7A3A2E,#2A1410)', p:18},
+  {t:'Atomic Habits', a:'James Clear', f:'PDF', g:'linear-gradient(135deg,#5F7A52,#232E1E)', p:0},
+  {t:'Sandman Vol. 1', a:'Neil Gaiman', f:'CBZ', g:'linear-gradient(135deg,#4A3B6B,#1D1630)', p:34},
+  {t:'Sapiens', a:'Yuval Noah Harari', f:'MOBI', g:'linear-gradient(135deg,#A67A2E,#4A3410)', p:81},
+  {t:'Klara and the Sun', a:'Kazuo Ishiguro', f:'FB2', g:'linear-gradient(135deg,#3A6B6B,#123030)', p:0}
+];
+const grid = document.getElementById('bookGrid');
+BOOKS.forEach(b=>{
+  const d = document.createElement('div');
+  d.className = 'book';
+  d.setAttribute('role','button');
+  d.innerHTML = '<div class="cover" style="width:100%;height:152px;background:'+b.g+'"><span class="fmt">'+b.f+'</span><span style="font-size:11px;font-family:Georgia,serif;font-weight:700">'+b.t+'</span><span style="font-size:8px;opacity:.75">'+b.a+'</span></div>'
+    + '<div class="t">'+b.t+'</div><div class="a">'+b.a+'</div>'
+    + (b.p ? '<div class="pbar" style="height:3px"><i style="width:'+b.p+'%"></i></div>' : '');
+  d.onclick = openReader;
+  grid.appendChild(d);
+});
+/* tabs */
+document.querySelectorAll('#tabbar .tab').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('#tabbar .tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const v = btn.dataset.tab;
+    document.querySelectorAll('[data-view]').forEach(s=>{ s.style.display = (s.dataset.view===v) ? 'block' : 'none'; });
+  };
+});
+/* library segments */
+document.querySelectorAll('#libSeg button').forEach(b=>{ b.onclick = ()=>{
+  document.querySelectorAll('#libSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  if(b.textContent!=='All') toast(b.textContent+' view — grouped from live metadata');
+};});
+/* search */
+function doSearch(q){
+  const el = document.getElementById('searchRes');
+  q = q.trim().toLowerCase();
+  if(!q){ el.innerHTML=''; return; }
+  const hits = BOOKS.filter(b=>(b.t+' '+b.a+' '+b.f).toLowerCase().includes(q));
+  el.innerHTML = hits.length ? hits.map(b=>
+    '<div class="bookrow" onclick="openReader()"><div class="cover" style="width:46px;height:66px;background:'+b.g+'"><span class="fmt" style="font-size:7px">'+b.f+'</span></div><div style="flex:1"><b style="font-size:14px">'+b.t+'</b><div class="note">'+b.a+'</div></div>'+ic('chev-r',16)+'</div>'
+  ).join('') : '<div class="note" style="padding:22px;text-align:center">No matches — try “dune”, “pdf” or “weir”.</div>';
+}
+/* reader */
+const reader = document.getElementById('reader');
+function openReader(){ reader.classList.add('open'); reader.classList.add('hidechrome'); }
+function closeReader(){ reader.classList.remove('open'); document.getElementById('ttsCard').classList.remove('open'); closeSheets(); }
+function toggleChrome(e){ if(e.target.closest('button')) return; reader.classList.toggle('hidechrome'); }
+function toggleTTS(){ const c=document.getElementById('ttsCard'); c.classList.toggle('open'); if(c.classList.contains('open')){ reader.classList.remove('hidechrome'); toast('Read-aloud started — sentence 1'); } }
+let playing = true;
+function togglePlay(){ playing=!playing; document.querySelector('#ttsPlay use').setAttribute('href', playing?'#i-pause':'#i-play'); }
+function openSheet(id){ document.getElementById('scrim').classList.add('open'); document.getElementById(id).classList.add('open'); }
+function closeSheets(){ document.getElementById('scrim').classList.remove('open'); document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); }
+document.querySelectorAll('.rate').forEach(r=>{ r.onclick=()=>{ document.querySelectorAll('.rate').forEach(x=>x.classList.remove('on')); r.classList.add('on'); toast('Speed '+r.textContent); }; });
+/* reader themes — exact tokens.ts values */
+const THEMES = [
+  {id:'day',label:'Day',bg:'#FBF7F0',text:'#1E1B16',muted:'#6B6357',acc:'#C4623A',c:'7:1+'},
+  {id:'sepia',label:'Sepia',bg:'#F4E8D0',text:'#433422',muted:'#7A6A54',acc:'#8C5A1E',c:'8:1'},
+  {id:'night',label:'Night',bg:'#1C1A17',text:'#E8E0D2',muted:'#A89D8A',acc:'#E08A5B',c:'12:1'},
+  {id:'console',label:'Console',bg:'#0E1A12',text:'#B8E6B8',muted:'#8FC08F',acc:'#7CE68A',c:'9:1'},
+  {id:'oled',label:'OLED',bg:'#000000',text:'#E8E0D2',muted:'#A89D8A',acc:'#E08A5B',c:'15:1'}
+];
+const rbody = document.getElementById('rbody');
+function applyTheme(t){
+  rbody.style.background = t.bg; rbody.style.color = t.text;
+  document.getElementById('rchap').style.color = t.acc;
+  rbody.querySelectorAll('h2,p').forEach(n=>{ n.style.color = t.text; });
+  document.getElementById('rlead').style.color = t.text;
+  document.querySelectorAll('#themeRow .themeopt').forEach(el=>el.classList.toggle('on', el.dataset.id===t.id));
+}
+const trow = document.getElementById('themeRow');
+THEMES.forEach(t=>{
+  const d = document.createElement('div');
+  d.className = 'themeopt' + (t.id==='day' ? ' on' : ''); d.dataset.id = t.id;
+  d.innerHTML = '<div style="background:'+t.bg+';padding:12px;display:flex;flex-direction:column;gap:6px"><div style="height:8px;border-radius:4px;background:'+t.text+'"></div><div style="height:8px;border-radius:4px;background:'+t.text+';opacity:.5;width:75%"></div><div style="height:8px;border-radius:4px;background:'+t.acc+';width:50%"></div></div><div style="text-align:center;padding:8px;font-size:12.5px;font-weight:700">'+t.label+'</div>';
+  d.onclick = ()=>{ applyTheme(t); toast(t.label+' theme applied'); };
+  trow.appendChild(d);
+});
+/* fonts */
+const FONTS = [
+  {l:'Crimson — Serif', d:'The default reading voice', f:'Georgia,serif'},
+  {l:'Atkinson — Accessible', d:'Maximum legibility', f:'Verdana,Geneva,sans-serif'},
+  {l:'Inter — Clean', d:'Neutral sans', f:"-apple-system,'Segoe UI',sans-serif"}
+];
+const frow = document.getElementById('fontRow');
+FONTS.forEach(f=>{
+  const b = document.createElement('button');
+  b.className = 'fontopt';
+  b.innerHTML = '<span style="font-family:'+f.f+'">'+f.l+' <span style="color:var(--muted);font-size:13px">— Ag</span></span>'+ic('check',17);
+  b.querySelector('svg').style.color = 'var(--brand)';
+  b.querySelector('svg').style.opacity = f.f.indexOf('Georgia')===0 ? '1' : '0';
+  b.onclick = ()=>{ rbody.style.fontFamily = f.f; frow.querySelectorAll('svg').forEach(s=>s.style.opacity='0'); b.querySelector('svg').style.opacity='1'; toast(f.l); };
+  frow.appendChild(b);
+});
+let fs = 18;
+function fontSize(d){ fs = Math.min(32, Math.max(12, fs+d)); rbody.style.fontSize = fs+'px'; document.getElementById('fsLabel').textContent = fs+' pt'; }
+rbody.style.fontSize = '18px';
+applyTheme(THEMES[0]);
+/* highlight colors */
+const HLS = [{c:'#F5C443',p:0},{c:'#E08A5B',p:0},{c:'#9DB493',p:0},{c:'#E39AA4',p:0},{c:'#8FC1E3',p:1},{c:'#B79CED',p:1},{c:'#8FE3B0',p:1},{c:'#F1948A',p:1}];
+const hlr = document.getElementById('hlRow');
+HLS.forEach(h=>{
+  const b = document.createElement('button');
+  b.setAttribute('aria-label','Highlight color');
+  b.style.cssText = 'width:42px;height:42px;border-radius:21px;border:2px solid rgba(255,255,255,.7);cursor:pointer;background:'+h.c+';display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,.55);'+(h.p?'opacity:.75':'');
+  b.innerHTML = h.p ? ic('lock',15) : '';
+  b.onclick = ()=>toast(h.p ? 'Premium color — see paywall' : 'Highlight saved');
+  hlr.appendChild(b);
+});
+/* theme gallery */
+const gal = document.getElementById('themeGallery');
+THEMES.forEach(t=>{
+  const w = document.createElement('div');
+  w.innerHTML = '<div class="phone" style="height:430px"><div class="notch"></div><div class="statusbar" style="color:'+t.muted+'"><span>9:41</span><span class="sic">'+ic('signal',0)+'</span></div>'
+    + '<div class="screen"><div class="scroll" style="background:'+t.bg+';color:'+t.text+';padding:14px 26px 24px;font-family:Georgia,serif;font-size:15px;line-height:1.7">'
+    + '<div style="font-size:11px;letter-spacing:2px;font-weight:800;color:'+t.acc+';font-family:-apple-system,sans-serif">CHAPTER 12 · ARRAKIS</div>'
+    + '<div style="font-size:21px;font-weight:700;margin:6px 0 10px">The Gom Jabbar</div>'
+    + '<p style="margin:.7em 0">In the week before their departure to Arrakis, an old crone in a black gown appeared before Paul in the hall.</p>'
+    + '<p style="margin:.7em 0">“Have you ever heard of the <span style="background:'+t.acc+'44;border-radius:3px;padding:0 3px">Gom Jabbar</span>?” she asked.</p>'
+    + '<p style="color:'+t.muted+';font-size:12.5px;font-family:-apple-system,sans-serif">62% · Dune — Frank Herbert · contrast '+t.c+'</p>'
+    + '</div></div></div><p class="cap"><b>'+t.label+'</b> — '+t.bg+' on '+t.text+' · '+t.c+'</p>';
+  const st = w.querySelector('.sic'); st.innerHTML = ic('signal',15)+ic('wifi',15)+ic('battery',15);
+  st.style.display='flex'; st.style.gap='6px';
+  gal.appendChild(w);
+});
+/* checklist */
+const CHECKS = ['No emoji as icons — SVG only','Lucide 1.5pt stroke system','Body contrast 4.5:1+','48dp touch targets','Blurred reader chrome','Hairline dividers','Drop caps + kickers','Brass reserved for Premium'];
+const cl = document.getElementById('checklist');
+CHECKS.forEach(c=>{
+  const d = document.createElement('div');
+  d.className = 'feat';
+  d.innerHTML = '<div class="bdot">'+ic('check',17)+'</div><div style="font-size:13.5px;font-weight:600">'+c+'</div>';
+  cl.appendChild(d);
+});
+/* dark toggle */
+const modeBtn = document.getElementById('modeBtn');
+modeBtn.onclick = ()=>{
+  document.body.classList.toggle('dark');
+  const dark = document.body.classList.contains('dark');
+  modeBtn.querySelector('span').textContent = dark ? 'Light page' : 'Dark page';
+  modeBtn.querySelector('use').setAttribute('href', dark ? '#i-sun' : '#i-moon');
+};
+</script>
+</body>
+</html>

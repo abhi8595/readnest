@@ -1,0 +1,10 @@
+{
+  "platforms": [
+    "apple",
+    "android"
+  ],
+  "apple": {
+    "podName": "ReadNestTts",
+    "deploymentTarget": "15.1"
+  }
+}

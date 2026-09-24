@@ -1,0 +1,7 @@
+{
+  "extends": "expo",
+  "ignorePatterns": ["shots/out/*", "assets/archive/*"],
+  "rules": {
+    "import/no-unresolved": "off"
+  }
+}

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* ── ReadNest semantic tokens (NativeWind v4 @theme) ────────────────────
+   Light "Paper" default; `.dark` overrides to "Ember".
+   Components must use these utilities only (no raw hex) per pro-rules.   */
+
+@theme {
+  --color-paper: #fbf7f0;
+  --color-ink: #1e1b16;
+  --color-card: #ffffff;
+  --color-well: #f3ede2;
+  --color-muted: #6b6357;
+  --color-faint: #8a8175;
+  --color-brand: #c4623a;
+  --color-onbrand: #ffffff;
+  --color-branddeep: #8c3b1b;
+  --color-sage: #7c9070;
+  --color-gold: #c9a45c;
+  --color-golddeep: #7a5c14;
+  --color-ongold: #1e1b16;
+  --color-line: #e3daca;
+  --color-ring: #c4623a;
+  --color-danger: #b3261e;
+
+  --font-ui: "Inter", system-ui, sans-serif;
+  --font-read-serif: "Crimson Pro", Georgia, serif;
+  --font-read-alt: "Libre Baskerville", Georgia, serif;
+  --font-read-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --radius-chip: 8px;
+  --radius-card: 12px;
+  --radius-sheet: 16px;
+  --radius-player: 20px;
+
+  --shadow-rest: 0 1px 2px rgba(30, 27, 22, 0.06);
+  --shadow-raised: 0 4px 12px rgba(30, 27, 22, 0.1);
+  --shadow-overlay: 0 12px 32px rgba(30, 27, 22, 0.22);
+}
+
+.dark {
+  --color-paper: #1c1a17;
+  --color-ink: #f3ede2;
+  --color-card: #26221d;
+  --color-well: #2e2924;
+  --color-muted: #c9bfae;
+  --color-faint: #9a9081;
+  --color-brand: #e08a5b;
+  --color-onbrand: #1c1a17;
+  --color-branddeep: #f0b48a;
+  --color-sage: #9db493;
+  --color-line: #3a342c;
+  --color-ring: #e08a5b;
+  --color-danger: #f2a49e;
+}
