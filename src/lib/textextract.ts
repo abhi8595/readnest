@@ -145,6 +145,10 @@ function splitMarkdown(raw: string): { label: string; body: string }[] {
   let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) heads.push({ title: (m[1] ?? '').trim(), index: m.index });
   if (!heads.length) return [{ label: 'Text', body: raw }];
+  if (heads[0] && heads[0].index > 0) {
+    const intro = raw.slice(0, heads[0].index).trim();
+    if (intro) out.push({ label: 'Preface', body: intro });
+  }
   heads.forEach((h, i) => {
     const end = i + 1 < heads.length ? (heads[i + 1] as { index: number }).index : raw.length;
     out.push({ label: h.title.slice(0, 120), body: raw.slice(h.index, end).replace(/^#{1,3}\s+.+$/m, '').trim() });

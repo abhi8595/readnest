@@ -45,18 +45,20 @@ export async function upsertBook(b: Partial<BookRow> & { file_uri: string; forma
     page_count: b.page_count ?? null, date_added: t, date_modified: t,
     last_read_at: null, last_location: null, reading_progress: 0,
     is_favorite: 0, is_archived: 0, folder_path: b.folder_path ?? null,
-    rating: 0, read_count: 0, last_finished_at: null,
+    rating: b.rating ?? 0, read_count: b.read_count ?? 0, last_finished_at: b.last_finished_at ?? null,
   };
   await db.runAsync(
     `INSERT INTO books (id,file_uri,saf_uri,title,author,series,series_index,format,mime,file_size,
       content_hash,cover_uri,description,publisher,published_year,language,page_count,date_added,
-      date_modified,last_read_at,last_location,reading_progress,is_favorite,is_archived,folder_path)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      date_modified,last_read_at,last_location,reading_progress,is_favorite,is_archived,folder_path,
+      rating,read_count,last_finished_at)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [row.id, row.file_uri, row.saf_uri, row.title, row.author, row.series, row.series_index,
      row.format, row.mime, row.file_size, row.content_hash, row.cover_uri, row.description,
      row.publisher, row.published_year, row.language, row.page_count, row.date_added,
      row.date_modified, row.last_read_at, row.last_location, row.reading_progress,
-     row.is_favorite, row.is_archived, row.folder_path],
+     row.is_favorite, row.is_archived, row.folder_path,
+     row.rating, row.read_count, row.last_finished_at],
   );
   return row;
 }

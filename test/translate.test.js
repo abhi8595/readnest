@@ -58,3 +58,27 @@ test('translate E2: extraction is cost-capped', () => {
   const items = extractParagraphs(chapters, 'c0', 3, 100000);
   assert.equal(items.length, 3);
 });
+
+test('translate E1: DeepL endpoint selects free vs pro by key suffix', async () => {
+  const origFetch = global.fetch;
+  const calls = [];
+  global.fetch = async (url, opts) => {
+    calls.push({ url, headers: opts.headers });
+    return {
+      ok: true,
+      json: async () => ({ translations: [{ text: 'Hola' }] }),
+    };
+  };
+  try {
+    const { translateText } = require('../src/lib/translate');
+    const freeRes = await translateText('Hello', 'es', { provider: 'deepl', deeplKey: 'my-key:fx' }, 'book-free');
+    assert.equal(freeRes, 'Hola');
+    assert.equal(calls[0].url, 'https://api-free.deepl.com/v2/translate');
+
+    const proRes = await translateText('Hello', 'es', { provider: 'deepl', deeplKey: 'my-pro-key' }, 'book-pro');
+    assert.equal(proRes, 'Hola');
+    assert.equal(calls[1].url, 'https://api.deepl.com/v2/translate');
+  } finally {
+    global.fetch = origFetch;
+  }
+});

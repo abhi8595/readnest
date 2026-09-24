@@ -82,9 +82,13 @@ async function checked(res: Response, provider: string): Promise<Response> {
 }
 
 async function viaDeepL(text: string, targetLang: string, key: string): Promise<string> {
-  const res = await fetch('https://api-free.deepl.com/v2/translate', {
+  const cleanKey = key.trim();
+  const endpoint = cleanKey.endsWith(':fx')
+    ? 'https://api-free.deepl.com/v2/translate'
+    : 'https://api.deepl.com/v2/translate';
+  const res = await fetch(endpoint, {
     method: 'POST',
-    headers: { Authorization: `DeepL-Auth-Key ${key}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `DeepL-Auth-Key ${cleanKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ text: [text], target_lang: targetLang.toUpperCase() }),
   });
   await checked(res, 'DeepL');

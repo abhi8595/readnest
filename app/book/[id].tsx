@@ -24,6 +24,7 @@ export default function AboutDocument() {
   const { palette } = useTheme();
   const insets = useSafeAreaInsets();
   const refresh = useLibraryStore((s) => s.refresh);
+  const refreshCollections = useLibraryStore((s) => s.refreshCollections);
   const sortKey = useSettingsStore((s) => s.sortKey);
 
   const [book, setBook] = useState<BookRow | null>(null);
@@ -241,10 +242,14 @@ export default function AboutDocument() {
           <Pressable
             onPress={() => {
               if (!newShelf.trim()) return;
-              void createCollection(newShelf.trim()).then((c) => addToCollection(c.id, book.id)).then(() => {
-                setNewShelf('');
-                setShelfOpen(false);
-              });
+              void createCollection(newShelf.trim())
+                .then((c) => addToCollection(c.id, book.id))
+                .then(async () => {
+                  setNewShelf('');
+                  setShelfOpen(false);
+                  await refreshCollections();
+                  setCollections(await listCollections());
+                });
             }}
             accessibilityRole="button" accessibilityLabel="Create shelf"
             style={{ backgroundColor: palette.primary, borderRadius: 12, paddingHorizontal: 18, justifyContent: 'center' }}

@@ -106,8 +106,10 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
     } catch { /* non-fatal */ }
   },
   loadCollectionBooks: async (id) => {
-    const books = await booksInCollection(id);
-    set({ collectionBooks: { ...get().collectionBooks, [id]: books } });
+    try {
+      const books = await booksInCollection(id);
+      set({ collectionBooks: { ...get().collectionBooks, [id]: books } });
+    } catch { /* non-fatal */ }
   },
   setScanning: (v, p) => set({ scanning: v, ...(p ? { scanProgress: p } : {}) }),
   setError: (lastError) => set({ lastError }),

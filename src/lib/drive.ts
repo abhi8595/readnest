@@ -175,8 +175,11 @@ export async function mergeSnapshot(snap: DriveSnapshot, opts?: MergeOptions): P
       // Cross-device rows reference absolute paths that don't exist here:
       // keep registry/progress, verify the file before opening (reader handles missing files).
       await db.runAsync(
-        `INSERT INTO books (id,file_uri,saf_uri,title,author,series,series_index,format,mime,file_size,content_hash,cover_uri,description,publisher,published_year,language,page_count,date_added,date_modified,last_read_at,last_location,reading_progress,is_favorite,is_archived,folder_path,rating,read_count,last_finished_at)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        `INSERT INTO books (id,file_uri,saf_uri,title,author,series,series_index,format,mime,file_size,
+          content_hash,cover_uri,description,publisher,published_year,language,page_count,date_added,
+          date_modified,last_read_at,last_location,reading_progress,is_favorite,is_archived,folder_path,
+          rating,read_count,last_finished_at)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         [b.id, b.file_uri, s(b.saf_uri), s(b.title), s(b.author), s(b.series),
          num(b.series_index), s(b.format) ?? 'epub', s(b.mime), n(b.file_size), s(b.content_hash),
          s(b.cover_uri), s(b.description), s(b.publisher), num(b.published_year),
@@ -261,17 +264,20 @@ export async function mergeSnapshot(snap: DriveSnapshot, opts?: MergeOptions): P
   for (const r of ((snap.settings ?? []) as Record<string, unknown>[]).slice(0, 5000)) {
     if (typeof r.book_id !== 'string') continue;
     await db.runAsync(
-      `INSERT INTO reading_settings (book_id,theme,font_family,custom_font_uri,font_size,font_weight,line_spacing,margin,hyphenation,brightness,orientation,page_mode,tts_rate,tts_voice)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      `INSERT INTO reading_settings (book_id,theme,font_family,custom_font_uri,font_size,font_weight,line_spacing,margin,hyphenation,brightness,orientation,page_mode,tts_rate,tts_voice,focus_mode,bionic,irlen_tint,tts_index)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
        ON CONFLICT(book_id) DO UPDATE SET theme=excluded.theme, font_family=excluded.font_family,
          custom_font_uri=excluded.custom_font_uri, font_size=excluded.font_size, font_weight=excluded.font_weight,
          line_spacing=excluded.line_spacing, margin=excluded.margin, hyphenation=excluded.hyphenation,
          brightness=excluded.brightness, orientation=excluded.orientation, page_mode=excluded.page_mode,
-         tts_rate=excluded.tts_rate, tts_voice=excluded.tts_voice`,
+         tts_rate=excluded.tts_rate, tts_voice=excluded.tts_voice,
+         focus_mode=excluded.focus_mode, bionic=excluded.bionic,
+         irlen_tint=excluded.irlen_tint, tts_index=excluded.tts_index`,
       [r.book_id, s(r.theme) ?? 'day', s(r.font_family) ?? 'crimson', s(r.custom_font_uri),
        n(r.font_size, 18), n(r.font_weight, 400), typeof r.line_spacing === 'number' ? r.line_spacing : 1.6,
        s(r.margin) ?? 'M', n(r.hyphenation, 1), num(r.brightness), s(r.orientation) ?? 'system',
-       s(r.page_mode) ?? 'paginated', typeof r.tts_rate === 'number' ? r.tts_rate : 1.0, s(r.tts_voice)]);
+       s(r.page_mode) ?? 'paginated', typeof r.tts_rate === 'number' ? r.tts_rate : 1.0, s(r.tts_voice),
+       s(r.focus_mode) ?? 'off', n(r.bionic, 0), s(r.irlen_tint) ?? 'none', n(r.tts_index, 0)]);
   }
   return { merged, conflicts };
 }

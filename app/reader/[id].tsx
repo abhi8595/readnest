@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, AppState, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, ScrollView, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Brightness from 'expo-brightness';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -182,7 +182,10 @@ export default function Reader() {
           if (cancelled) return;
           setComicPages(pages);
           setKind('comic');
-          if (pages.length > 0) setPosition({ progress: b.reading_progress ?? 0, page: 1, pageCount: pages.length });
+          const pMatch = /^p:(\d+)$/.exec(b.last_location ?? '');
+          const initPage = pMatch?.[1] ? Math.max(1, parseInt(pMatch[1], 10)) : 1;
+          const pageTarget = pages.length > 0 ? Math.min(pages.length, initPage) : 1;
+          if (pages.length > 0) setPosition({ progress: b.reading_progress ?? 0, page: pageTarget, pageCount: pages.length, location: `p:${pageTarget}` });
         } else if (b.format === 'cbr') {
           const pages = await tryExtractCbr(b.file_uri, b.id);
           if (pages) {
@@ -258,7 +261,7 @@ export default function Reader() {
       } catch { /* offline — stay monolingual */ }
     })();
     return () => { cancelled = true; };
-  }, [settings.bilingual, settings.translateTarget, kind, chapters, book?.id, location]);
+  }, [settings.bilingual, settings.translateTarget, kind, chapters, book, location]);
 
   /* ── Persist position + session on exit / background ── */
   const persist = useCallback(async () => {
@@ -476,7 +479,7 @@ export default function Reader() {
   }, [setPosition]);
 
   const onPagedPosition = useCallback((p: { progress: number; page: number; pageCount: number }) => {
-    setPosition({ progress: p.progress, page: p.page, pageCount: p.pageCount });
+    setPosition({ progress: p.progress, page: p.page, pageCount: p.pageCount, location: `p:${p.page}` });
   }, [setPosition]);
 
   /* ── Selection → highlight / note / dictionary ─────── */
@@ -540,9 +543,11 @@ export default function Reader() {
   const saveHighlight = useCallback(async (color: string) => {
     const st = useReaderStore.getState();
     if (!st.book) return;
+    const curLoc = st.location ?? (st.pageCount ? `p:${st.page}` : null);
+    const curChap = st.chapterLabel ?? (st.pageCount ? `Page ${st.page}` : null);
     await upsertQuote({
       book_id: st.book.id, text: selectedText, note: noteDraft || null,
-      color, location: st.location, chapter: st.chapterLabel,
+      color, location: curLoc, chapter: curChap,
     });
     setSelectOpen(false);
     setSelectedText('');
@@ -647,7 +652,9 @@ export default function Reader() {
       chapterBreaks: ttsBreaks.current,
       onSentence: (i) => markSpoken(i),
       onDone: () => tts.set({ status: 'idle' }),
-      onStopped: () => tts.set({ status: 'idle' }),
+      onStopped: () => {
+        if (useTTSStore.getState().status !== 'paused') tts.set({ status: 'idle' });
+      },
     });
   }, [kind, ttsMap, tts, book?.language, markSpoken, pdfArticleChapters, pdfPages, pdfTarget, startPageNum]);
 
@@ -688,7 +695,7 @@ export default function Reader() {
     });
     if (ok) tts.set({ status: 'speaking', showBar: true, background: true });
     else Alert.alert('Background play failed', 'The audio service could not start on this device.');
-  }, [isPremium, kind, ttsMap, tts, book?.language, book?.title, needPremium, markSpoken]);
+  }, [isPremium, kind, ttsMap, tts, book?.language, book?.title, needPremium, markSpoken, pdfArticleChapters]);
 
   const toggleTts = useCallback(() => {
     if (tts.background) {
@@ -717,7 +724,9 @@ export default function Reader() {
         chapterBreaks: ttsBreaks.current,
         onSentence: (i) => markSpoken(i),
         onDone: () => tts.set({ status: 'idle' }),
-        onStopped: () => {},
+        onStopped: () => {
+          if (useTTSStore.getState().status !== 'paused') tts.set({ status: 'idle' });
+        },
       });
     } else {
       startTts();
@@ -731,17 +740,22 @@ export default function Reader() {
     }
     const next = Math.max(0, Math.min(ttsSentences.current.length - 1, ttsIndex.current + dir * 3));
     ttsIndex.current = next;
-    if (tts.status !== 'idle') {
+    if (tts.status === 'speaking') {
       void stopSpeaking();
-      tts.set({ status: 'speaking' });
+      tts.set({ timeLeft: estimateTimeLeft(ttsSentences.current, next, tts.rate) });
       void speakSentences({
         sentences: ttsSentences.current, fromIndex: next, rate: tts.rate,
         language: book?.language ?? 'en',
         chapterBreaks: ttsBreaks.current,
         onSentence: (i) => markSpoken(i),
         onDone: () => tts.set({ status: 'idle' }),
-        onStopped: () => {},
+        onStopped: () => {
+          if (useTTSStore.getState().status !== 'paused') tts.set({ status: 'idle' });
+        },
       });
+    } else if (tts.status === 'paused') {
+      tts.set({ timeLeft: estimateTimeLeft(ttsSentences.current, next, tts.rate) });
+      markSpoken(next);
     }
   }, [tts, book?.language, markSpoken]);
 
@@ -938,20 +952,34 @@ export default function Reader() {
         </Pressable>
         {marks.length === 0 ? (
           <Text style={{ color: palette.muted, fontFamily: 'Inter', paddingVertical: 8 }}>No bookmarks yet — your reading position is always saved automatically.</Text>
-        ) : marks.map((m) => (
-          <Pressable
-            key={m.id}
-            onPress={() => {
-              if (m.location.startsWith('c')) readerRef.current?.gotoChapter(m.location);
-              setMarksOpen(false);
-            }}
-            accessibilityRole="menuitem" accessibilityLabel={m.label ?? m.location}
-            style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: palette.border }}
-          >
-            <Text style={{ fontSize: 15, color: palette.foreground, fontFamily: 'Inter' }}>{m.label ?? m.location}</Text>
-          </Pressable>
-        ))}
-        <View style={{ height: 200 }} />
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 360 }}>
+            {marks.map((m) => (
+              <Pressable
+                key={m.id}
+                onPress={() => {
+                  const pMatch = /^p:(\d+)$/.exec(m.location);
+                  if (pMatch?.[1]) {
+                    const pageNum = parseInt(pMatch[1], 10);
+                    if (kind === 'pdf') {
+                      if (pdfArticleChapters) readerRef.current?.gotoChapter(`pdf-p${pageNum}`);
+                      else setPdfTarget(pageNum);
+                    } else if (kind === 'comic') {
+                      comicRef.current?.scrollTo(pageNum - 1);
+                    }
+                  } else if (m.location.startsWith('c')) {
+                    readerRef.current?.gotoChapter(m.location);
+                  }
+                  setMarksOpen(false);
+                }}
+                accessibilityRole="menuitem" accessibilityLabel={m.label ?? m.location}
+                style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: palette.border }}
+              >
+                <Text style={{ fontSize: 15, color: palette.foreground, fontFamily: 'Inter' }}>{m.label ?? m.location}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
       </Sheet>
 
       {/* Selection → highlight/note/dictionary */}
@@ -1130,7 +1158,7 @@ function SearchResults({ query, chapters, onJump }: {
     return <Text style={{ color: palette.muted, fontFamily: 'Inter', marginTop: 12 }}>No matches for “{query}”.</Text>;
   }
   return (
-    <View style={{ marginTop: 8 }}>
+    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380, marginTop: 8 }}>
       {results.map((r, i) => (
         <Pressable
           key={i}
@@ -1145,7 +1173,7 @@ function SearchResults({ query, chapters, onJump }: {
       <View style={{ marginTop: 8 }}>
         <ProgressBar value={0} height={0} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -1170,7 +1198,7 @@ function PdfSearchResults({ query, pages, onJump }: {
     return <Text style={{ color: palette.muted, fontFamily: 'Inter', marginTop: 12 }}>No matches for “{query}”.</Text>;
   }
   return (
-    <View style={{ marginTop: 8 }}>
+    <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380, marginTop: 8 }}>
       {results.map((r) => (
         <Pressable
           key={r.page}
@@ -1184,6 +1212,6 @@ function PdfSearchResults({ query, pages, onJump }: {
           <Text numberOfLines={2} style={{ fontSize: 14, color: palette.foreground, fontFamily: 'Inter', marginTop: 2 }}>{r.snippet}</Text>
         </Pressable>
       ))}
-    </View>
+    </ScrollView>
   );
 }

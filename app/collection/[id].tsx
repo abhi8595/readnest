@@ -67,7 +67,7 @@ export default function CollectionDetail() {
         </Pressable>
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 18, fontWeight: '700', color: palette.foreground, fontFamily: 'Inter' }}>{name}</Text>
-          <Text style={{ fontSize: 12, color: palette.muted, fontFamily: 'Inter' }}>{books.length} books</Text>
+          <Text style={{ fontSize: 12, color: palette.muted, fontFamily: 'Inter' }}>{books.length} book{books.length === 1 ? '' : 's'}</Text>
         </View>
         <Pressable
           onPress={() => Alert.alert('Delete shelf?', 'Books stay in your library — only the shelf is removed.', [

@@ -138,6 +138,16 @@ test('txt: markdown headings become chapters', async () => {
   assert.ok(ch[0].html.includes('First para.'));
 });
 
+test('txt: markdown with preamble retains preface', async () => {
+  const uri = await writeText('preface.md', 'An introductory note before chapters.\n\n# Chapter One\n\nBody here.\n');
+  const ch = await extractTextChapters(uri, 'txt');
+  assert.equal(ch.length, 2);
+  assert.equal(ch[0].label, 'Preface');
+  assert.ok(ch[0].html.includes('introductory note'));
+  assert.equal(ch[1].label, 'Chapter One');
+  assert.ok(ch[1].html.includes('Body here.'));
+});
+
 test('txt: plain text chunks + first-line title', async () => {
   const uri = await writeText('p.txt', 'My Title\n\nBody line one.\n\nBody line two.\n');
   const ch = await extractTextChapters(uri, 'txt');

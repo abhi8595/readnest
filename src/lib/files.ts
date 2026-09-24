@@ -43,10 +43,15 @@ export async function copyIntoLibrary(srcUri: string, filename: string): Promise
 export async function fileSize(uri: string): Promise<number> {
   try {
     const size = new FileSystem.File(uri).size;
-    return typeof size === 'number' && Number.isFinite(size) ? size : 0;
-  } catch {
-    return 0; // content:// URIs and missing files report no size
-  }
+    if (typeof size === 'number' && Number.isFinite(size) && size > 0) return size;
+  } catch { /* content:// URIs or File API unsupported */ }
+  try {
+    const info = await FileSystem.getInfoAsync(uri);
+    if (info.exists && typeof (info as { size?: number }).size === 'number') {
+      return (info as { size?: number }).size!;
+    }
+  } catch { /* missing file */ }
+  return 0;
 }
 
 /**

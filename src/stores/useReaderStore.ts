@@ -65,18 +65,21 @@ export const useReaderStore = create<ReaderState>((set) => ({
   focusMode: 'off',
   bionic: false,
   irlenTint: 'none',
-  openBook: (book, saved) =>
+  openBook: (book, saved) => {
+    const m = /^p:(\d+)$/.exec(book.last_location ?? '');
+    const savedPage = m?.[1] ? Math.max(1, parseInt(m[1], 10)) : 1;
     set({
       book,
       progress: book.reading_progress ?? 0,
       location: book.last_location ?? null,
       toc: [],
       chapterLabel: null,
-      page: 1,
+      page: savedPage,
       pageCount: book.page_count ?? null,
       chromeVisible: false,
       ...(saved ?? {}),
-    }),
+    });
+  },
   closeBook: () => set({ book: null, toc: [], chapterLabel: null }),
   setPosition: (p) =>
     set((s) => ({

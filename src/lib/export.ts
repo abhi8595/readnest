@@ -60,7 +60,8 @@ export async function shareMarkdown(filename: string, markdown: string): Promise
     const available = await Sharing.isAvailableAsync().catch(() => false);
     if (available) {
       const safe = filename.replace(/[^\w.\-]+/g, '_');
-      const uri = `${FileSystem.Paths.cache.uri}${Date.now()}-${safe}`;
+      const base = FileSystem.Paths.cache.uri.endsWith('/') ? FileSystem.Paths.cache.uri : `${FileSystem.Paths.cache.uri}/`;
+      const uri = `${base}${Date.now()}-${safe}`;
       await FileSystem.writeAsStringAsync(uri, markdown, { encoding: FileSystem.EncodingType.UTF8 });
       await Sharing.shareAsync(uri, { mimeType: 'text/markdown' });
       return 'shared';
